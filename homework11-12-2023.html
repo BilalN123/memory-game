@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run To Fun 😁
+  
+    </title>
+  <style>
+    body {
+      font-family: helvetica, arial, sans-serif;
+      margin: 2em;
+      background-color: slategrey;
+      color: white;
+    }
+    h1 {
+      font-family: verdana, arial, sans-serif;
+    }
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      border: grey;
+    }
+    button:hover {
+      background-color: Aliceblue;
+    }
+    #startBtn {
+      width: 100px;
+      color: DarkSlateGray;
+    }
+    #stopBtn {
+      width: 100px;
+      color: DarkSlateGray;
+    }
+    #gameButtonArea {
+      margin: 8px;
+    }
+    #gameButtonArea > button {
+      width: 200px;
+      height: 200px;
+      margin: 8px;
+    }
+    .hidden {
+      display: none;
+    }
+    #button1 {
+      background: lightgreen;
+    }
+    #button1:active, #button1.lit {
+      background: green;
+    }
+    #button2 {
+      background: lightblue;
+    }
+    #button2:active, #button2.lit {
+      background: blue;
+    }
+    #button3 {
+      background: pink;
+    }
+    #button3:active, #button3.lit{
+      background: red;
+    }
+    #button4 {
+      background: lightyellow;
+    }
+    #button4:active, #button4.lit {
+      background: yellow;
+    }
+    #button5 {
+      background: Burlywood;
+    }
+    #button5:active, #button5.lit {
+      background: Chocolate;
+    }
+    #button6 {
+      background: Lavender;
+    }
+    #button6:active, #button6.lit {
+      background: BlueViolet;
+    }
+  </style>
+  
+</head>
+<body>
+    <div class="username-container flex gap-4">
+        <label for="username"> enter username: </label>
+        <input type="text" name="username" id="username">
+        <button onclick="enterUsername()">next</button>
+    </div>
+    <div class="flex gap-4">
+        <p>username:</p>
+        <p class="user-value"></p>
+    </div>
+  <h1>Light and Sound Memory Game 🤯</h1>
+  <p>Welcome to the game! Repeat back the pattern by pressing buttons.</p>
+  <button id="startBtn" onclick="startGame()">Start</button>
+  <button id="stopBtn" class="hidden" onclick="stopGame()">Stop</button>
+  <p id="clock">Countdown: </p>
+  <div id="gameButtonArea">
+    <button id="button1" onclick="guess(1)" onmousedown="startTone(1)" onmouseup="stopTone()"></button>
+    <button id="button2" onclick="guess(2)" onmousedown="startTone(2)" onmouseup="stopTone()"></button>
+    <button id="button3" onclick="guess(3)" onmousedown="startTone(3)" onmouseup="stopTone()"></button>
+    <button id="button4" onclick="guess(4)" onmousedown="startTone(4)" onmouseup="stopTone()"></button>
+    <button id="button5" onclick="guess(5)" onmousedown="startTone(5)" onmouseup="stopTone()"></button>
+    <button id="button6" onclick="guess(6)" onmousedown="startTone(6)" onmouseup="stopTone()"></button>
+  </div>
+<script>
+ 
+const nextClueWaitTime = 1000; 
+const cluePauseTime = 333; 
+const len = 6;
+
+
+var pattern = [1, 1, 5, 5, 6, 6];
+
+var progress = 0;
+var gamePlaying = false;
+var tonePlaying = false;
+var volume = 0.5; 
+var guessCounter = 0;
+var clueHoldTime = 1000; 
+var mistakes = 0;
+let timer = null; 
+var count = 20;
+var reset = false;
+
+function generatePattern() {
+  
+  for (let j = 0; j < len; j++) {
+    pattern[j] = Math.ceil(Math.random() * 6);
+  }
+}
+
+function startGame() {
+  
+  console.log(pattern);
+  progress = 0;
+  gamePlaying = true;
+  clueHoldTime = 1000;
+  document.getElementById("startBtn").classList.add("hidden");
+  document.getElementById("stopBtn").classList.remove("hidden");
+  generatePattern();
+  playClueSequence();
+} 
+
+function stopGame() {
+  gamePlaying = false;
+  document.getElementById("startBtn").classList.remove("hidden");
+  document.getElementById("stopBtn").classList.add("hidden");
+  reset=true;
+}
+
+
+const freqMap = {
+  1: 261.63, //C
+  2: 293.66, //D
+  3: 329.63, //E
+  4: 349.23, //F
+  5: 392, //G
+  6: 440 //A
+};
+function playTone(btn, len) {
+  o.frequency.value = freqMap[btn];
+  g.gain.setTargetAtTime(volume, context.currentTime + 0.05, 0.025);
+  tonePlaying = true;
+  setTimeout(function() {
+    stopTone();
+  }, len); 
+}
+function startTone(btn) {
+  if (!tonePlaying) {
+    o.frequency.value = freqMap[btn];
+    g.gain.setTargetAtTime(volume, context.currentTime + 0.05, 0.025);
+    tonePlaying = true;
+  }
+}
+function stopTone() {
+  g.gain.setTargetAtTime(0, context.currentTime + 0.05, 0.025);
+  tonePlaying = false;
+}
+
+
+var context = new AudioContext();
+var o = context.createOscillator();
+var g = context.createGain();
+g.connect(context.destination);
+g.gain.setValueAtTime(0, context.currentTime);
+o.connect(g);
+o.start(0);
+
+function lightButton(btn) {
+  document.getElementById("button" + btn).classList.add("lit");
+}
+function clearButton(btn) {
+  document.getElementById("button" + btn).classList.remove("lit");
+} 
+
+function playSingleClue(btn) {
+  if (gamePlaying) {
+    lightButton(btn);
+    playTone(btn, clueHoldTime);
+    setTimeout(clearButton, clueHoldTime, btn);
+  }
+}
+
+let userText = document.querySelector('#username')
+function enterUsername() {
+
+    document.querySelector('.username-container').classList.add('hidden')
+    localStorage.setItem('value', userText.value)
+    document.querySelector('.user-value').innerText = localStorage.getItem('value')
+}
+
+function playClueSequence() {
+  guessCounter = 0;
+  mistakes = 0;
+  let delay = nextClueWaitTime; //set delay to initial wait time
+  for (let i = 0; i <= progress; i++) {
+    // for each clue that is revealed so far
+    console.log("play single clue: " + pattern[i] + " in " + delay + "ms");
+    setTimeout(playSingleClue, delay, pattern[i]); // set a timeout to play that clue
+    delay += clueHoldTime;
+    delay += cluePauseTime;
+  }
+  clueHoldTime -= 100;
+  count = 20;
+  reset = false;
+
+  clearInterval(timer);
+  timer = setInterval(countDown, 1000);
+}
+
+function countDown() {
+    
+    document.getElementById("clock").innerHTML =
+      "Countdown: " + count + " s";
+    count -= 1; 
+    if (count < 0 || reset) {
+      if(!reset) {
+        stopGame(); 
+        alert("Time is up. You lost.");
+      }
+      resetTimer();
+      clearInterval(timer);
+    }
+}
+function resetTimer(){
+  count = 20;
+  document.getElementById("clock").innerHTML = "Countdown: 0 s";
+}
+
+function loseGame() {
+  stopGame();
+  alert("Game Over. You lost.");
+}
+
+function winGame() {
+  stopGame();
+  alert("Game Over. You won!");
+}
+
+function guess(btn) {
+  console.log("user guessed: " + btn);
+  if (!gamePlaying) {
+    return;
+  }
+
+  
+  if (btn === pattern[guessCounter]) {
+    
+    if (guessCounter === progress) {
+      if (progress === pattern.length - 1) {
+       
+        winGame(); 
+        reset = true;
+      } else {
+        
+        progress++;
+        playClueSequence();
+      }
+    } else {
+      
+      guessCounter++;
+    }
+  } else {
+    
+    mistakes++;
+    if (mistakes === 3) {
+      
+      loseGame();
+      reset = true;
+    } else {
+      
+      alert("Wrong! Attempts left:" + (3 - mistakes));
+    }
+  }
+}
+</script>
+</body>
+</html>
