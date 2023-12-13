@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Run To Fun 😁
+  <title>Run To Fun😁
   
     </title>
   <style>
@@ -13,6 +13,10 @@
       margin: 2em;
       background-color: slategrey;
       color: white;
+      text-align: center;
+      position: relative;
+
+    
     }
     h1 {
       font-family: verdana, arial, sans-serif;
@@ -33,8 +37,35 @@
       width: 100px;
       color: DarkSlateGray;
     }
-    #gameButtonArea {
+    .youLose{
+      padding-left: 200px;
+      min-width: 100vh;
+      font-size: 250px;
+      position: absolute;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     color: red
+ 
+     
+    }
+    .hidden-class{
+      display: none;
+    }
+    .game-containers{
+      min-width: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #gameButtonArea {
+      display: flex;
+      flex-wrap: wrap;
+      width: 500px;
       margin: 8px;
+      justify-content: center;
+    align-items: center;
+      
     }
     #gameButtonArea > button {
       width: 200px;
@@ -80,10 +111,12 @@
     #button6:active, #button6.lit {
       background: BlueViolet;
     }
+   
   </style>
   
 </head>
 <body>
+  <div class="youLose hidden-class"><p>you lose</p></div>
     <div class="username-container flex gap-4">
         <label for="username"> enter username: </label>
         <input type="text" name="username" id="username">
@@ -98,13 +131,15 @@
   <button id="startBtn" onclick="startGame()">Start</button>
   <button id="stopBtn" class="hidden" onclick="stopGame()">Stop</button>
   <p id="clock">Countdown: </p>
-  <div id="gameButtonArea">
-    <button id="button1" onclick="guess(1)" onmousedown="startTone(1)" onmouseup="stopTone()"></button>
-    <button id="button2" onclick="guess(2)" onmousedown="startTone(2)" onmouseup="stopTone()"></button>
-    <button id="button3" onclick="guess(3)" onmousedown="startTone(3)" onmouseup="stopTone()"></button>
-    <button id="button4" onclick="guess(4)" onmousedown="startTone(4)" onmouseup="stopTone()"></button>
-    <button id="button5" onclick="guess(5)" onmousedown="startTone(5)" onmouseup="stopTone()"></button>
-    <button id="button6" onclick="guess(6)" onmousedown="startTone(6)" onmouseup="stopTone()"></button>
+  <div class="game-containers">
+    <div id="gameButtonArea" >
+      <button id="button1" onclick="guess(1)" onmousedown="startTone(1)" onmouseup="stopTone()"></button>
+      <button id="button2" onclick="guess(2)" onmousedown="startTone(2)" onmouseup="stopTone()"></button>
+      <button id="button3" onclick="guess(3)" onmousedown="startTone(3)" onmouseup="stopTone()"></button>
+      <button id="button4" onclick="guess(4)" onmousedown="startTone(4)" onmouseup="stopTone()"></button>
+      <!-- <button id="button5" onclick="guess(5)" onmousedown="startTone(5)" onmouseup="stopTone()"></button>
+      <button id="button6" onclick="guess(6)" onmousedown="startTone(6)" onmouseup="stopTone()"></button> -->
+    </div>
   </div>
 <script>
  
@@ -129,7 +164,7 @@ var reset = false;
 function generatePattern() {
   
   for (let j = 0; j < len; j++) {
-    pattern[j] = Math.ceil(Math.random() * 6);
+    pattern[j] = Math.ceil(Math.random() * 4);
   }
 }
 
@@ -158,8 +193,8 @@ const freqMap = {
   2: 293.66, //D
   3: 329.63, //E
   4: 349.23, //F
-  5: 392, //G
-  6: 440 //A
+  // 5: 392, //G
+  // 6: 440 //A
 };
 function playTone(btn, len) {
   o.frequency.value = freqMap[btn];
@@ -253,7 +288,13 @@ function resetTimer(){
 
 function loseGame() {
   stopGame();
-  alert("Game Over. You lost.");
+  // alert("Game Over. You lost.");
+  document.querySelector('.youLose').classList.remove('hidden-class')
+  setTimeout(()=>{
+    document.querySelector('.youLose').classList.add('hidden-class')
+
+  },2000)
+
 }
 
 function winGame() {
